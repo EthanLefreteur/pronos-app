@@ -1,3 +1,4 @@
+import { saveLastScreen, getLastScreen } from '../../services/navigationStorage';
 import { useEffect, useState } from 'react';
 import {
   View,
@@ -32,7 +33,19 @@ export default function CompetitionsScreen({ navigation }: any) {
 
   useEffect(() => {
     loadCompetitions();
+    restoreNavigation();
   }, []);
+
+  const restoreNavigation = async () => {
+    const lastScreen = await getLastScreen();
+
+    if (!lastScreen) return;
+
+    navigation.navigate(
+      lastScreen.screen,
+      lastScreen.params
+    );
+  };
 
   const addCompetition = async () => {
     await db.runAsync(
@@ -54,10 +67,18 @@ export default function CompetitionsScreen({ navigation }: any) {
         renderItem={({ item }) => (
           <Card
             style={styles.card}
-            onPress={() =>
+            onPress={() => {
+              saveLastScreen(
+                'CompetitionDetails',
+                {
+                  competitionId: item.id,
+                }
+              );
+
               navigation.navigate('CompetitionDetails', {
                 competitionId: item.id,
-              })
+              });
+            }
             }
           >
             <Card.Content>

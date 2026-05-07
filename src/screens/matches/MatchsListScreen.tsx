@@ -1,3 +1,4 @@
+import { saveLastScreen } from '../../services/navigationStorage';
 import { useEffect, useState } from 'react';
 import { FlatList, View } from 'react-native';
 import {
@@ -66,10 +67,18 @@ export default function MatchsListScreen({ route, navigation }: any) {
           <MatchCard
             match={item}
             onDelete={() => deleteMatch(item.id)}
-            onPress={() =>
+            onPress={() => {
+              saveLastScreen(
+                'MatchDetails',
+                {
+                  matchId: item.id,
+                }
+              );
+
               navigation.navigate('MatchDetails', {
                 matchId: item.id,
-              })
+              });
+            }
             }
           />
         )}
