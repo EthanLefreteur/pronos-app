@@ -9,6 +9,7 @@ import {
 import {
   ActivityIndicator,
   View,
+  Text,
 } from 'react-native';
 
 import { PaperProvider } from 'react-native-paper';
@@ -21,10 +22,17 @@ import {
   getLastScreen,
 } from './src/services/navigationStorage';
 
+import {
+  authenticateUser,
+} from './src/services/biometric';
+
 export default function App() {
 
   const [loading, setLoading] =
     useState(true);
+
+  const [authorized, setAuthorized] =
+    useState(false);
 
   const [initialRoute, setInitialRoute] =
     useState<any>(undefined);
@@ -38,6 +46,16 @@ export default function App() {
     try {
 
       await initDatabase();
+
+      const success =
+        await authenticateUser();
+
+      if (!success) {
+        setAuthorized(false);
+        return;
+      }
+
+      setAuthorized(true);
 
       const lastScreen =
         await getLastScreen();
@@ -56,6 +74,7 @@ export default function App() {
   };
 
   if (loading) {
+
     return (
       <View
         style={{
@@ -65,6 +84,29 @@ export default function App() {
         }}
       >
         <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  if (!authorized) {
+
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: 24,
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 20,
+            textAlign: 'center',
+          }}
+        >
+          Authentification refusée
+        </Text>
       </View>
     );
   }
